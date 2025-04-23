@@ -1,13 +1,20 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { generateTokenAndSetCookie  } from "../lib/utils/generateToken.js";
 export const signup =  async (req, res) => {
      try{
-          const {username, fullname, password, email} = req.body;
+          const {username, fullName, password, email} = req.body;
 
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+          
+  
           if (!emailRegex.test(email)) {
               return res.status(400).json({ message: "Invalid email format" });
+          }
+
+          if(password.length < 6){
+              res.status(400).json({message:"password length should be greater than 6"})
           }
 
           const existingUser = await User.findOne({ username });
@@ -21,22 +28,25 @@ export const signup =  async (req, res) => {
           }
 
           const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hashedPassword(password, salt);
+         const hashedPassword = await bcrypt.hash(password, salt);
 
+          console.log("User created successfully:", username);
           const newUser = new User({
                username,
-               fullname,
+               fullName,
                email,   
                password: hashedPassword
           });
+         
 
           if(newUser){
-             generateTokeAndSetCookie(newUser, res);
+            generateTokenAndSetCookie(newUser, res);
              await newUser.save();
+             console.log("User saved successfully:", newUser.username);
              return res.status(201).json({ 
                  _id: newUser._id,
                  username: newUser.username,
-                 fullname: newUser.fullname ,
+                 fullName: newUser.fullName ,
                  email: newUser.email,
                  followers: newUser.followers,
                  following: newUser.following,
@@ -49,14 +59,55 @@ export const signup =  async (req, res) => {
 
 
          }catch(error){
+            console.log("error in signup controller",  error.message);
             return res.status(500).json({ message: "Internal server error" });
      }
  }
 
  export const login =  async (req, res) => {
-    res.json({message : "hit the login route"});
+     try{
+            const {username , password } =  req.body;
+            const user  = await  User.findOne({username});
+            const isMatch = await bcrypt.compare(password,user?.password || "");
+
+           if(!user || !isMatch){
+             return res.status(404).json({message : "Invalid username and password"}); 
+           }
+
+        generateTokenAndSetCookie(user._id, res);
+        return res.status(200).json({
+            _id: user._id,
+            username: user.username,           
+            fullName: user.fullName,           
+            email: user.email,           
+            followers: user.followers,           
+            following: user.following,           
+            profileImg :user.profileImg,
+            coverImg :user.coverImg           
+        })
+     }catch(error){
+         console.log("error in login controller", error);
+         res.status(500).json({message: "Internal server Error"});
+
+     }
  }
  export const logout =  async (req, res) => {
-    res.json({message : "hit the logout route"});
+     try{
+        res.clearCookie("jwt");
+        return res.status(200).json({message: "Logout successful"});
+        
+     }catch(error){
+        console.log("error in logout controller",  error.message);
+        res.status(500).json({message: "Internal server Error"})
+     }
  }
 
+ export const getMe =  async(req,res) =>{
+      try{
+          const user  = await  User.findById(req.user._id).select("-password");
+          res.status(200).json(user);
+      }catch(error){
+           console.log("error in getMe controller",  error.message)
+           res.status(500).json({message: "Internal server Error"})
+      }
+ }
