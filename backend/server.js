@@ -8,6 +8,7 @@ import {v2 as cloudinary} from 'cloudinary'
 import authRoutes from './routes/auth.routes.js'
 import connectMongoDB from './db/connectMongoDB.js'
 import userRoutes from './routes/user.routes.js'
+import postRoutes from './routes/post.routes.js'                
 
 cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes )
 app.use('/api/users', userRoutes )
+app.use('/api/posts', postRoutes)
 
 const PORT = process.env.PORT || 5000
 
