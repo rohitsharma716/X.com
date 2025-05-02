@@ -8,7 +8,7 @@ import { BiLogOut } from "react-icons/bi";
 import { useMutation ,useQuery,useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { use } from "react";
+
 
 
 
@@ -38,9 +38,21 @@ const Sidebar = () => {
 			  toast.error("Failed to logout");
 		   }
 	  }) 
+	  const fetchAuthUser = async () => {
+		const res = await fetch("/api/auth/me");
+		const data = await res.json();
+		if (!res.ok) {
+		  throw new Error(data.error || "Failed to fetch auth user");
+		}
+		return data;
+	  };
 
 
-	const {data : authUser} =  useQuery({ queryKey: ["authUser"], });
+
+	const { data: authUser } = useQuery({
+		queryKey: ["authUser"],
+		queryFn: fetchAuthUser,
+	  });
 
 	return (
 		<div className='md:flex-[2_2_0] w-18 max-w-52'>
