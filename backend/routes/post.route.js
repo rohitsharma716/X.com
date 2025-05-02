@@ -14,9 +14,9 @@ router.post("/comment/:id",protectRoute,commentOnPost);
 router.delete("/:id",protectRoute,deletePosts);
 
 //get routes
-router.get("/allposts",protectRoute,getAllPosts);
+router.get("/all",protectRoute,getAllPosts);
 router.get("/liked/:id", protectRoute,getLikedPosts);
-router.get("/follwingposts",protectRoute,getFollowingPosts);
+router.get("/following",protectRoute,getFollowingPosts);
 router.get("/user/:username",protectRoute,getUserPosts);
 
 
