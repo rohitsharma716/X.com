@@ -7,7 +7,7 @@ export const getNotifications = async (req, res) => {
         const notification = await Notification.find({to: userId}).sort({createdAt: -1}).populate({path:"from",select:"-password"});
         
         await Notification.updateMany({to: userId}, {read: true})
-        res.status(200).json({notification});
+        res.status(200).json(notification);
 }
 catch(error){
     console.log("error in getNotifications controller", error.message);
