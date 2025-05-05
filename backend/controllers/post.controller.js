@@ -122,7 +122,7 @@ export const getAllPosts = async (req, res) => {
     try{
         const posts = await Post.find().sort({createdAt: -1}).populate({path:"user",select:"-password"}).populate({path:"comments.user",select:"-password"});
         if(posts.length === 0) return res.status(200).json([]);
-        res.status(200).json({posts});
+        res.status(200).json(posts);
     }catch(error){
         console.log("error in getAllPosts controller", error.message);
         res.status(500).json({message: "Internal server Error"});    
@@ -130,7 +130,7 @@ export const getAllPosts = async (req, res) => {
 }
 
 export const getLikedPosts = async (req, res) => {
-     const userId = req.user.id;
+     const userId = req.params.id;
 
     try{
         const user = await User.findById(userId);
@@ -138,7 +138,7 @@ export const getLikedPosts = async (req, res) => {
 
         const likedPosts = await Post.find({ _id: {$in: user.likedPosts}}).sort({createdAt: -1}).populate({path:"user",select:"-password"}).populate({path:"comments.user",select:"-password"});
 
-        res.status(200).json({likedPosts});
+        res.status(200).json(likedPosts);
         
     
 
@@ -156,7 +156,7 @@ export const getFollowingPosts = async (req, res) => {
         if(!user) return res.status(404).json({message: "User not found"});
         const following = user.following;
         const followingPosts = await Post.find({user: {$in: following}}).sort({createdAt: -1}).populate({path:"user",select:"-password"}).populate({path:"comments.user",select:"-password"});
-        res.status(200).json({followingPosts});
+        res.status(200).json(followingPosts);
     }
     catch(error){
         console.log("error in getFollowingPosts controller", error.message);
@@ -170,7 +170,7 @@ export const getUserPosts = async (req, res) => {
         const user = await User.findOne({username});
         if(!user) return res.status(404).json({message: "User not found"});
         const posts = await Post.find({user: user._id}).sort({createdAt: -1}).populate({path:"user",select:"-password"}).populate({path:"comments.user",select:"-password"});
-        res.status(200).json({posts});
+        res.status(200).json(posts);
     }
     catch(error){
         console.log("error in getUserPosts controller", error.message);
