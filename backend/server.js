@@ -3,7 +3,7 @@ dotenv.config()
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import {v2 as cloudinary} from 'cloudinary'
-
+ 
 
 import connectMongoDB from './db/connectMongoDB.js'
 import authRoutes from './routes/auth.route.js'

@@ -117,7 +117,7 @@ const { mutate: commentPost, isPending: isCommenting } = useMutation({
 	const postOwner = post.user;
 	const isLiked =  post.likes.includes(authUser?._id);
 
-	const isMyPost = authUser?.username === postOwner.username;
+	const isMyPost = authUser?._id === post?.user?._id;
 
 	const formattedDate = formatPostDate(post.createdAt);
 
